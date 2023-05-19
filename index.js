@@ -26,31 +26,58 @@ async function run() {
     await client.connect();
     const toyCollection = client.db("toyMarketplace").collection("toys");
 
+    // get data
     app.get("/addAToy", async (req, res) => {
       const result = await toyCollection.find().toArray();
       res.send(result);
     });
 
     app.get("/addAToy/:id", async (req, res) => {
-      const id = req.params.id
-      const query = {_id: new ObjectId(id)}
-      const result = await toyCollection.findOne(query)
-      res.send(result)
-    })
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await toyCollection.findOne(query);
+      res.send(result);
+    });
 
+    // post data
     app.post("/addAToy", async (req, res) => {
       const newToy = req.body;
       const result = await toyCollection.insertOne(newToy);
       res.send(result);
     });
 
+    // update data
+
+    app.patch("/addAToy/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedToys = req.body;
+      console.log(updatedToys);
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          photo: updatedToys.photo,
+          quantity: updatedToys.quantity,
+          name: updatedToys.name,
+          sellerName: updatedToys.sellerName,
+          email: updatedToys.email,
+          subCategory: updatedToys.subCategory,
+          price: updatedToys.price,
+          ratings: updatedToys.ratings,
+          details: updatedToys.details,
+        },
+      };
+      const result = await toyCollection.updateOne(filter, updatedDoc, options);
+      res.send(result);
+    });
+
     // delete
     app.delete("/addAToy/:id", async (req, res) => {
-      const id = req.params.id
-      const query = {_id: new ObjectId(id)}
-      const result = await toyCollection.deleteOne(query)
-      res.send(result)
-    })
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await toyCollection.deleteOne(query);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
