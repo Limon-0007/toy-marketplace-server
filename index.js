@@ -31,7 +31,7 @@ async function run() {
       const result = await toyCollection
         .find()
         .limit(20)
-        .sort({ createdAt: -1 })
+        .sort()
         .toArray();
       res.send(result);
     });
@@ -56,16 +56,19 @@ async function run() {
     });
 
     app.get("/myToys", async (req, res) => {
-      console.log(req.query.email);
-
+      console.log(req.query.query)
+      const sortOrder = req.query.query
+      
       let query = {};
       if (req.query?.email) {
         query = { email: req.query?.email };
       }
-      const result = await toyCollection.find(query).toArray();
-      console.log(result);
-      res.send(result);
+      const result = await toyCollection.find(query).sort({price: sortOrder === "asc" ? 1 : -1}).toArray();
+    res.send(result);
     });
+
+    // const result = await toyCollection.find(query).sort(query).collection({locale: "en_US", numericOrdering: true}).toArray();
+    // res.send(result);
 
     // post data
     app.post("/addAToy", async (req, res) => {
