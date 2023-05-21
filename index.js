@@ -65,6 +65,13 @@ async function run() {
     res.send(result);
     });
 
+    app.get("/toySearch/:text", async (req, res) => {
+      const text = req.params.text;
+      const AllData = await toyCollection.find().toArray();
+      const result = AllData.filter((data) => data.name.toLowerCase().includes(text.toLowerCase()));
+      res.send(result);
+    });
+
     // post data
     app.post("/addAToy", async (req, res) => {
       const newToy = req.body;
