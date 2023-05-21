@@ -28,7 +28,23 @@ async function run() {
 
     // get data
     app.get("/addAToy", async (req, res) => {
-      const result = await toyCollection.find().toArray();
+      const result = await toyCollection
+        .find()
+        .limit(20)
+        .sort({ createdAt: -1 })
+        .toArray();
+      res.send(result);
+    });
+
+    app.get("/addAToy/:subCategory", async (req, res) => {
+      const category = req.params.subCategory;
+
+      let subCategory = {};
+      if (category === "Bamboo_Buddy" || category === "Pawsome_Panda" || category === "Bamboo_Breeze") {
+        subCategory = { subCategory: category };
+      }
+      const result = await toyCollection.find(subCategory).toArray();
+      console.log(result);
       res.send(result);
     });
 
@@ -40,17 +56,16 @@ async function run() {
     });
 
     app.get("/myToys", async (req, res) => {
-      console.log(req.query.email)
+      console.log(req.query.email);
 
       let query = {};
       if (req.query?.email) {
         query = { email: req.query?.email };
       }
       const result = await toyCollection.find(query).toArray();
+      console.log(result);
       res.send(result);
     });
-
-    
 
     // post data
     app.post("/addAToy", async (req, res) => {
