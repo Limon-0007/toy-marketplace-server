@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    client.connect();
     const toyCollection = client.db("toyMarketplace").collection("toys");
 
     // get data
@@ -36,22 +36,22 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/addAToy/:subCategory", async (req, res) => {
-      const category = req.params.subCategory;
-
-      let subCategory = {};
-      if (category === "Bamboo_Buddy" || category === "Pawsome_Panda" || category === "Bamboo_Breeze") {
-        subCategory = { subCategory: category };
-      }
-      const result = await toyCollection.find(subCategory).toArray();
-      console.log(result);
-      res.send(result);
-    });
-
     app.get("/addAToy/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await toyCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.get("/myToys/:subCategory", async (req, res) => {
+      const category = req.params.subCategory;
+      console.log(category)
+      let sub_category = {};
+      if (category === "Bamboo_Buddy" || category === "Pawsome_Panda" || category === "Bamboo_Breeze") {
+        sub_category = { subCategory: category };
+      }
+      const result = await toyCollection.find(sub_category).toArray();
+      console.log(result);
       res.send(result);
     });
 
