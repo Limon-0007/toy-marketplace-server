@@ -28,11 +28,12 @@ async function run() {
 
     // get data
     app.get("/addAToy", async (req, res) => {
-      const result = await toyCollection
-        .find()
-        .limit(20)
-        .sort()
-        .toArray();
+      const search = req.query.search;
+      console.log(search);
+      const query = {
+        name: { $regex: search, $options: "i" },
+      };
+      const result = await toyCollection.find(query).limit(20).toArray();
       res.send(result);
     });
 
@@ -45,9 +46,13 @@ async function run() {
 
     app.get("/myToys/:subCategory", async (req, res) => {
       const category = req.params.subCategory;
-      console.log(category)
+      console.log(category);
       let sub_category = {};
-      if (category === "Bamboo_Buddy" || category === "Pawsome_Panda" || category === "Bamboo_Breeze") {
+      if (
+        category === "Bamboo_Buddy" ||
+        category === "Pawsome_Panda" ||
+        category === "Bamboo_Breeze"
+      ) {
         sub_category = { subCategory: category };
       }
       const result = await toyCollection.find(sub_category).toArray();
@@ -56,19 +61,24 @@ async function run() {
     });
 
     app.get("/myToys", async (req, res) => {
-      const sortOrder = req.query.query
+      const sortOrder = req.query.query;
       let query = {};
       if (req.query?.email) {
         query = { email: req.query?.email };
       }
-      const result = await toyCollection.find(query).sort({price: sortOrder === "asc" ? 1 : -1}).toArray();
-    res.send(result);
+      const result = await toyCollection
+        .find(query)
+        .sort({ price: sortOrder === "asc" ? 1 : -1 })
+        .toArray();
+      res.send(result);
     });
 
     app.get("/toySearch/:text", async (req, res) => {
       const text = req.params.text;
       const AllData = await toyCollection.find().toArray();
-      const result = AllData.filter((data) => data.name.toLowerCase().includes(text.toLowerCase()));
+      const result = AllData.filter((data) =>
+        data.name.toLowerCase().includes(text.toLowerCase())
+      );
       res.send(result);
     });
 
